@@ -118,7 +118,7 @@ class MigiCreate implements Migi {
 
     fse.outputFileSync(readmePath, data);
 
-    log.success("Created", path.join(process.cwd(), name));
+    log.success("Create", path.join(process.cwd(), name));
   }
 }
 
