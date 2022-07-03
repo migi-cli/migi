@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+      "declaration": false, // generate .d.ts
+      "target": "es5", // 生成目标
+      "module": "esnext", // 指定生成代码的模板标准
+      "moduleResolution": "node", // 如何处理模块
+      "removeComments": true, // 移除注释
+      "experimentalDecorators": true, // 开启装饰器语法
+      "importHelpers": true, // 防止同一 helper 函数出现在不同的文件中
+      "strict": true,
+      "resolveJsonModule": true,
+      "allowSyntheticDefaultImports": true,
+    },
+    "include": [
+      "src/**/*",
+    ],
+    "exclude": [
+      "node_modules"
+    ]
+  }

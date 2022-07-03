@@ -1,0 +1,55 @@
+{
+  "name": "migi-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/dist.js",
+  "bin": {
+    "migi": "bin/migi-cli.js"
+  },
+  "files": [
+    "bin"
+  ],
+  "scripts": {
+    "start": "rollup -c --watch",
+    "build": "rollup -c"
+  },
+  "keywords": [
+    "migi",
+    "migi-cli"
+  ],
+  "author": "xietian",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cac": "^6.7.12",
+    "colors": "^1.4.0",
+    "commander": "^9.3.0",
+    "compare-versions": "^4.1.3",
+    "dotenv": "^16.0.1",
+    "download-git-repo": "^3.0.2",
+    "fs-extra": "^10.1.0",
+    "inquirer": "^8.2.0",
+    "npmlog": "^6.0.2",
+    "ora": "^5.1.0",
+    "root-check": "^1.0.0",
+    "url-join": "^4.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-json": "^4.1.0",
+    "@types/colors": "^1.2.1",
+    "@types/fs-extra": "^9.0.13",
+    "@types/inquirer": "^8.2.1",
+    "@types/node": "^18.0.0",
+    "@types/npmlog": "^4.1.4",
+    "@types/root-check": "^1.0.0",
+    "@types/url-join": "^4.0.1",
+    "@typescript-eslint/parser": "^5.30.3",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.7.1",
+    "rollup": "^2.75.7",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.32.1",
+    "typescript": "^4.7.4"
+  }
+}
