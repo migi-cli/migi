@@ -31,14 +31,17 @@ class MigiPublish implements Migi {
 
   async exec() {
     const startTime = new Date().getTime();
-
     const git = new Git({ ...this.prepareInfo, ...this.options });
-    log.info("1. Step Checking", colors.cyan("Git Config"));
+
+    log.info("1.Step Checking", colors.cyan("Git Config"));
     await git.precommit();
-    log.info("2. Step Commting", colors.cyan("Code"));
+
+    log.info("2.Step Commting", colors.cyan("Code"));
     await git.commit();
-    log.info("3. Step Running", colors.cyan("CI/CD"));
+
+    log.info("3.Step Running", colors.cyan("CI/CD"));
     await git.publish();
+
     const endTime = new Date().getTime();
     log.info(
       "Publish",

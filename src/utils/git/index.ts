@@ -3,6 +3,8 @@ import path from "path";
 import fse from "fs-extra";
 import inquirer from "inquirer";
 import colors from "colors";
+import ora from "ora";
+import semver, { ReleaseType } from "semver";
 import { PublishOptions, PublishPrepareInfo } from "../../types";
 import { ensureCliHome, log } from "../../utils";
 import { readFile, writeFile } from "../file";
@@ -11,7 +13,6 @@ import Github from "./Github";
 import Gitee from "./Gitee";
 import Gitlab from "./Gitlab";
 import { ApiResult } from "./request";
-import ora from "ora";
 
 const GIT_ROOT_DIR = ".git";
 const GIT_SERVER_FILE = ".gitserver";
@@ -19,6 +20,9 @@ const GIT_TOKEN_FILE = ".gittoken";
 const GIT_LOGIN_FILE = ".gitlogin";
 const GIT_OWN_FILE = ".gitown";
 const GIT_IGNORE_FILE = ".gitignore";
+const VERSION_RELEASE = "release"; // release分支名
+const VERSION_DEVELOP = "dev"; // dev分支名
+type Version = typeof VERSION_RELEASE | typeof VERSION_DEVELOP;
 const GIT_SERVER_LIST = [
   {
     name: "Github",
@@ -67,6 +71,7 @@ export class Git {
   private login: string = ""; // 账户名或组织名
   private repo: any; // api调用远程仓库拿到的结果
   private remote: string = ""; // 远程仓库的git地址
+  private branch: string = ""; // 分支名
   constructor({
     name,
     version,
@@ -94,7 +99,15 @@ export class Git {
     await this.checkGitIgnore();
     await this.initGit();
   }
-  async commit() {}
+  async commit() {
+    await this.checkVersion();
+    await this.checkStash();
+    await this.checkConflict();
+    await this.checkCommit();
+    await this.checkoutBranch(this.branch);
+    await this.pullOriginMatserAndThisBranch();
+    await this.pushOrigin(this.branch);
+  }
   async publish() {}
 
   async checkGitServer() {
@@ -301,8 +314,9 @@ pnpm-debug.log*
       await this.pullOrigin("master", {
         "--allow-unrelated-histories": null,
       });
+    } else {
+      await this.pushOrigin("master");
     }
-    await this.pushOrigin("master");
   }
 
   async checkConflict() {
@@ -369,6 +383,140 @@ pnpm-debug.log*
   async pushOrigin(branchName: string) {
     await this.git.push("origin", branchName);
     log.success("GitPush", `Exec 'git push origin ${branchName}'`);
+  }
+
+  async checkVersion() {
+    // 检测分支及版本号
+    // 1. 如果远程分支还没有 `releaseVersion` 或 `devVersion > releaseVersion`, 则本地分支设为 `${VERSION_DEVELOP}/${devVersion}`
+    // 2. 如果 `devVersion <= releaseVersion`, 则需要升级版本
+    const remoteBranchList = await this.getRemoteBranchList(VERSION_RELEASE);
+    let releaseVersion = null;
+    if (remoteBranchList?.length > 0) {
+      // 获取线上最新版本
+      releaseVersion = remoteBranchList[0];
+    }
+    const devVersion = this.version;
+    if (!releaseVersion || semver.gt(this.version, releaseVersion)) {
+      this.branch = `${VERSION_DEVELOP}/${devVersion}`;
+    } else {
+      const { releaseType } = await inquirer.prompt<{
+        releaseType: ReleaseType;
+      }>({
+        name: "releaseType",
+        type: "list",
+        choices: [
+          {
+            name: `Patch（${releaseVersion} -> ${semver.inc(
+              releaseVersion,
+              "patch"
+            )}）`,
+            value: "patch",
+          },
+          {
+            name: `Minor（${releaseVersion} -> ${semver.inc(
+              releaseVersion,
+              "minor"
+            )}）`,
+            value: "minor",
+          },
+          {
+            name: `Major（${releaseVersion} -> ${semver.inc(
+              releaseVersion,
+              "major"
+            )}）`,
+            value: "major",
+          },
+        ],
+        default: "patch",
+        message: "Update version",
+      });
+      const newVersion = semver.inc(releaseVersion, releaseType) as string;
+      this.branch = `${VERSION_DEVELOP}/${newVersion}`;
+      this.version = newVersion;
+      this.syncVersionToPackageJson();
+      log.success(
+        "CheckVersion",
+        `Update version from ${colors.green(devVersion)} to ${colors.green(
+          releaseVersion
+        )}`
+      );
+    }
+    log.success("CheckVersion", `Using brach ${colors.green(this.branch)}`);
+  }
+
+  async getRemoteBranchList(
+    version?: Version
+  ): Promise<(string | undefined)[]> {
+    // git ls-remote --refs
+    const lsremote = await this.git.listRemote(["--refs"]);
+    let reg: RegExp;
+    if (version === VERSION_RELEASE) {
+      reg = /.+?refs\/tags\/release\/(\d+\.\d+\.\d+)/g;
+    } else {
+      reg = /.+?refs\/heads\/dev\/(\d+\.\d+\.\d+)/g;
+    }
+    return lsremote
+      .split("\n")
+      .map((remote) => {
+        const match = reg.exec(remote);
+        reg.lastIndex = 0;
+        if (match && semver.valid(match[1])) {
+          return match[1];
+        }
+      })
+      .filter((_) => _)
+      .sort((a, b) => {
+        if (!a || !b) return -1;
+        if (semver.lte(b, a)) {
+          if (a === b) return 0;
+          return -1;
+        }
+        return 1;
+      });
+  }
+
+  syncVersionToPackageJson() {
+    const pkg = fse.readJsonSync(`${this.dir}/package.json`);
+    if (pkg?.version !== this.version) {
+      pkg.version = this.version;
+      fse.writeJsonSync(`${this.dir}/package.json`, pkg, { spaces: 2 });
+    }
+  }
+
+  async checkStash() {
+    const stashList = await this.git.stashList();
+    if (stashList.all.length > 0) {
+      await this.git.stash(["pop"]);
+      log.success("CheckStash", "Exec 'git stash pop'");
+    } else {
+      log.success("CheckStash", "stash list is empty, skip stash pop");
+    }
+  }
+
+  async checkoutBranch(branch: string) {
+    const localBranchList = await this.git.branchLocal();
+    if (localBranchList.all.indexOf(branch) >= 0) {
+      await this.git.checkout(branch);
+    } else {
+      await this.git.checkoutLocalBranch(branch);
+    }
+    log.success("CheckoutBranch", `Switch branch to ${colors.green(branch)}`);
+  }
+
+  async pullOriginMatserAndThisBranch() {
+    // 合并远程master及this.branch至本地
+    await this.pullOrigin("master");
+    await this.checkConflict();
+    const remoteBranchList = await this.getRemoteBranchList();
+    if (remoteBranchList.indexOf(this.version) >= 0) {
+      await this.pullOrigin(this.branch);
+      await this.checkConflict();
+    } else {
+      log.notice(
+        "PullOriginMatserAndThisBranch",
+        `Remote branch ${colors.green(this.branch)} was not found`
+      );
+    }
   }
 
   // 创建本地缓存文件
