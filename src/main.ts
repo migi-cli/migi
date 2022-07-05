@@ -24,7 +24,17 @@ function registerCommand() {
     })
     .action(create);
 
-  cli.command("publish", "[Publish project]").alias("p").action(publish);
+  cli
+    .command("publish", "[Publish project]")
+    .alias("p")
+    .option("--refreshGitServer", "Force refresh `~/migi/.git/.gitserver`")
+    .option("--refreshGitToken", "Force refresh `~/migi/.git/.gittoken`")
+    .option(
+      "--refreshGitOwner",
+      "Force refresh `~/migi/.git/.gitown` and `~/migi/.git/.gitlogin`"
+    )
+
+    .action(publish);
 
   cli.help();
   cli.version(pkg.version);

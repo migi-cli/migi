@@ -1,4 +1,4 @@
-## migi-cli
+## migi
 
 > 前端一站式脚手架工具，为项目提供从`初始化、开发到部署`的全流程解决方案
 
@@ -17,11 +17,14 @@
 - 定制复杂：jenkins/travis 定制过程需要使用 java 开发插件，对前端不够友好
 
 ### TODO
-- [x] 初始化项目
+- [x] 项目初始化
   - [ ] ejs动态渲染
   - [ ] 模版更新判断
-- [ ] Git Flow自动化
-- [ ] 云构建CI
-- [ ] 云发布CD
+- [ ] 项目发布
+  - [ ] Git Flow自动化
+  - [ ] 云构建CI
+  - [ ] 云发布CD
+
+<!-- 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 -->
 
 

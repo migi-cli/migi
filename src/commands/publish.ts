@@ -1,16 +1,8 @@
 import path from "path";
 import colors from "colors";
 import fse from "fs-extra";
-import { Migi } from "../types";
+import { Migi, PublishOptions, PublishPrepareInfo } from "../types";
 import { Git, log } from "../utils";
-
-interface PublishOptions {}
-
-interface PublishPrepareInfo {
-  name: string;
-  version: string;
-  dir: string;
-}
 
 class MigiPublish implements Migi {
   private options: PublishOptions;
@@ -40,12 +32,12 @@ class MigiPublish implements Migi {
   async exec() {
     const startTime = new Date().getTime();
 
-    const git = new Git();
-    log.info("Publish", colors.cyan("Checking Git Config"));
+    const git = new Git({ ...this.prepareInfo, ...this.options });
+    log.info("1. Step Checking", colors.cyan("Git Config"));
     await git.precommit();
-    log.info("Publish", colors.cyan("Commting Code"));
+    log.info("2. Step Commting", colors.cyan("Code"));
     await git.commit();
-    log.info("Publish", colors.cyan("Running CI/CD"));
+    log.info("3. Step Running", colors.cyan("CI/CD"));
     await git.publish();
     const endTime = new Date().getTime();
     log.info(

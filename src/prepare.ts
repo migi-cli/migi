@@ -6,8 +6,8 @@ import fse from "fs-extra";
 import dotenv from "dotenv";
 import path from "path";
 import pkg from "../package.json";
-import { DEFAULT_CLI_HOME, LOW_NODE_VERSION } from "./constants";
-import { getSemverNpmVersions, log } from "./utils";
+import { LOW_NODE_VERSION } from "./constants";
+import { getSemverNpmVersions, log, ensureCliHome } from "./utils";
 const userHome = homedir();
 
 export default async function prepare() {
@@ -50,12 +50,7 @@ function checkEnv() {
     // Load env
     dotenv.config({ path: envPath });
   }
-  // User can custom CLI_HOME by set `MIGI_CLI_HOME=${custom_cli_home}` in global `.env` file.
-  if (!process.env.MIGI_CLI_HOME) {
-    process.env.MIGI_CLI_HOME = DEFAULT_CLI_HOME;
-  }
-  // Create cli home
-  fse.ensureDirSync(path.join(userHome, process.env.MIGI_CLI_HOME));
+  ensureCliHome();
 }
 
 async function checkUpdate() {
