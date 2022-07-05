@@ -15,6 +15,6 @@ export default abstract class GitServer {
   abstract createRepo(name: string): any;
   abstract createOrgRepo(login: string, name: string): any;
   abstract getRemote(login: string, name: string): string;
-  abstract getSSHKeysUrl(): void;
-  abstract getSSHKeysHelpUrl(): void;
+  abstract getSSHKeysUrl(): string;
+  abstract getSSHKeysHelpUrl(): string;
 }

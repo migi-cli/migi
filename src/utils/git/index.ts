@@ -92,7 +92,7 @@ export class Git {
     await this.checkGitOwner();
     await this.checkRepo();
     await this.checkGitIgnore();
-    await this.init();
+    await this.initGit();
   }
   async commit() {}
   async publish() {}
@@ -267,24 +267,111 @@ pnpm-debug.log*
     }
   }
 
-  async init() {
-    if (await this.getRemote()) return;
-    await this.initAndAddRemote();
+  async initGit() {
+    const yes = this.hasInit();
+    if (!yes) {
+      await this.initAndAddRemote();
+    }
     await this.initCommit();
   }
 
-  async getRemote() {
-    const gitPath = path.resolve(this.dir, GIT_ROOT_DIR);
+  hasInit(): boolean | undefined {
+    // 检测带发布项目目录是否存在.git文件夹
     this.remote = this.gitServer.getRemote(this.login, this.name);
+    const gitPath = path.resolve(this.dir, GIT_ROOT_DIR);
     if (fse.existsSync(gitPath)) {
-      log.success("Init", "Git init successful");
+      log.success("GitInit", "Found `.git` fold, skip git init.");
       return true;
     }
   }
 
-  async initAndAddRemote() {}
-  async initCommit() {}
+  async initAndAddRemote() {
+    await this.git.init();
+    log.success("GitInit", "Exec 'git init'");
+    const remotes = await this.git.getRemotes();
+    if (!remotes.find((item) => item.name === "origin")) {
+      await this.git.addRemote("origin", this.remote);
+      log.success("GitInit", "Exec 'git add remote'");
+    }
+  }
+  async initCommit() {
+    await this.checkConflict();
+    await this.checkCommit();
+    if (await this.isRemoteMasterExist()) {
+      await this.pullOrigin("master", {
+        "--allow-unrelated-histories": null,
+      });
+    }
+    await this.pushOrigin("master");
+  }
 
+  async checkConflict() {
+    const status = await this.git.status();
+    if (status.conflicted.length > 0) {
+      throw new Error("Code Conflict, please fix it and retry");
+    }
+    log.success("CheckConflict", "Good, the code has no conflict");
+  }
+
+  async checkCommit() {
+    const status = await this.git.status();
+    if (
+      status.not_added.length > 0 ||
+      status.created.length > 0 ||
+      status.deleted.length > 0 ||
+      status.modified.length > 0
+      // status.renamed.length > 0
+    ) {
+      await this.git.add(status.not_added);
+      await this.git.add(status.created);
+      await this.git.add(status.deleted);
+      await this.git.add(status.modified);
+      // await this.git.add(status.renamed);
+      let message;
+      while (!message) {
+        const res = await inquirer.prompt<{ message: string }>({
+          name: "message",
+          type: "input",
+          message: "Please input commit message",
+          default: "",
+        });
+        message = res.message;
+      }
+      await this.git.commit(message);
+      log.success("CheckCommit", "Exec 'git add' and 'git commit'");
+    }
+  }
+
+  async isRemoteMasterExist(): Promise<boolean> {
+    return (
+      (await this.git.listRemote(["--refs"])).indexOf("refs/heads/master") >= 0
+    );
+  }
+
+  async pullOrigin(branchName: string, options = {}) {
+    await this.git.pull("origin", branchName, options).catch((err) => {
+      if (err.message.indexOf("Permission denied (publickey)") >= 0) {
+        throw new Error(
+          `Please copy you local 'ssh publickey' to ${this.gitServer.getSSHKeysUrl()}. (docs: ${this.gitServer.getSSHKeysHelpUrl()})`
+        );
+      } else {
+        log.warn("GitPull", err.message);
+      }
+      log.error(
+        "GitPull",
+        "Please retry `migi publish`, if it still goes wrong, try delete `.git` flod and try again."
+      );
+      process.exit(0);
+    });
+    log.success("GitPull", `Exec 'git pull origin ${branchName}'`);
+  }
+
+  async pushOrigin(branchName: string) {
+    await this.git.push("origin", branchName);
+    log.success("GitPush", `Exec 'git push origin ${branchName}'`);
+  }
+
+  // 创建本地缓存文件
   // ~/.migi/.git/${filename}
   createCachePath(filename: string): string {
     const gitDir = path.resolve(this.cliHome, GIT_ROOT_DIR);

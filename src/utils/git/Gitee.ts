@@ -26,10 +26,10 @@ export default class Gitee extends GitServer {
   getRemote(login: string, name: string) {
     return "";
   }
-  getSSHKeysUrl(): void {
+  getSSHKeysUrl(): string {
     throw new Error("Method not implemented.");
   }
-  getSSHKeysHelpUrl(): void {
+  getSSHKeysHelpUrl(): string {
     throw new Error("Method not implemented.");
   }
   setToken(): void {

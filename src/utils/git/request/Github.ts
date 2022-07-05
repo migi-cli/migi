@@ -26,6 +26,8 @@ export default class GithubRequest implements Request {
         return response.data;
       },
       (error) => {
+        // TODO: catch error
+        console.log(error.response);
         if (error.response && error.response.data) {
           return error.response;
         } else {

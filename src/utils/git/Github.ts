@@ -58,10 +58,10 @@ export default class Github extends GitServer {
   getRemote(login: string, name: string) {
     return `git@github.com:${login}/${name}.git`;
   }
-  getSSHKeysUrl(): void {
-    throw new Error("Method not implemented.");
+  getSSHKeysUrl(): string {
+    return "https://github.com/settings/keys";
   }
-  getSSHKeysHelpUrl(): void {
-    throw new Error("Method not implemented.");
+  getSSHKeysHelpUrl(): string {
+    return "https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/connecting-to-github-with-ssh";
   }
 }
