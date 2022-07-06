@@ -5,6 +5,7 @@ import inquirer from "inquirer";
 import colors from "colors";
 import ora from "ora";
 import semver, { ReleaseType } from "semver";
+import { execSync } from "child_process";
 import { PublishOptions, PublishPrepareInfo } from "../../types";
 import { ensureCliHome, log } from "../../utils";
 import { readFile, writeFile } from "../file";
@@ -107,6 +108,9 @@ export class Git {
     await this.checkoutBranch(this.branch);
     await this.pullOriginMatserAndThisBranch();
     await this.pushOrigin(this.branch);
+  }
+  async build() {
+    await this.checkBuildDist();
   }
   async publish() {}
 
@@ -519,6 +523,27 @@ pnpm-debug.log*
     }
   }
 
+  async checkBuildDist() {
+    // 检查是否有 `build` 命令，有则执行
+    const pkg = this.getPackageJson();
+    if (!pkg.scripts || !Object.keys(pkg.scripts).includes("build")) {
+      throw new Error("`build` script was not found");
+    }
+    // if (this.buildCmd) {
+    //   require("child_process").execSync(this.buildCmd, {
+    //     cwd: this.dir,
+    //   });
+    // } else {
+    //   require("child_process").execSync("npm run build", {
+    //     cwd: this.dir,
+    //   });
+    // }
+    execSync("npm run build", {
+      cwd: this.dir,
+    });
+    log.success("CheckBuildDist", "Build success");
+  }
+
   // 创建本地缓存文件
   // ~/.migi/.git/${filename}
   createCachePath(filename: string): string {
@@ -526,6 +551,14 @@ pnpm-debug.log*
     const cachePath = path.resolve(gitDir, filename);
     fse.ensureDirSync(gitDir);
     return cachePath;
+  }
+
+  getPackageJson() {
+    const pkgPath = path.resolve(this.dir, "package.json");
+    if (!fse.existsSync(pkgPath)) {
+      throw new Error("package.json 不存在！");
+    }
+    return fse.readJsonSync(pkgPath);
   }
 }
 
