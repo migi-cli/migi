@@ -15,4 +15,6 @@ export interface PublishOptions {
   refreshGitServer?: boolean;
   refreshGitToken?: boolean;
   refreshGitOwner?: boolean;
+  refreshPlatform?: boolean;
+  prod?: boolean;
 }

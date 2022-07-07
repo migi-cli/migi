@@ -33,6 +33,8 @@ function registerCommand() {
       "--refreshGitOwner",
       "Force refresh `~/migi/.git/.gitown` and `~/migi/.git/.gitlogin`"
     )
+    .option("--refreshPlatform", "Force refresh `~/migi/.git/.publishplatform`")
+    .option("--prod", "Publish to production")
 
     .action(publish);
 

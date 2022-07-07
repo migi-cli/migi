@@ -34,6 +34,7 @@
     "root-check": "^1.0.0",
     "semver": "^7.3.7",
     "simple-git": "^3.10.0",
+    "socket.io-client": "^4.5.1",
     "url-join": "^4.0.0"
   },
   "devDependencies": {

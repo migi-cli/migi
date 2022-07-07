@@ -14,6 +14,7 @@ import Github from "./Github";
 import Gitee from "./Gitee";
 import Gitlab from "./Gitlab";
 import { ApiResult } from "./request";
+import CloudBuild from "../build";
 
 const GIT_ROOT_DIR = ".git";
 const GIT_SERVER_FILE = ".gitserver";
@@ -21,6 +22,7 @@ const GIT_TOKEN_FILE = ".gittoken";
 const GIT_LOGIN_FILE = ".gitlogin";
 const GIT_OWN_FILE = ".gitown";
 const GIT_IGNORE_FILE = ".gitignore";
+const PUBLISH_PLATFORM = ".publishplatform";
 const VERSION_RELEASE = "release"; // release分支名
 const VERSION_DEVELOP = "dev"; // dev分支名
 type Version = typeof VERSION_RELEASE | typeof VERSION_DEVELOP;
@@ -56,6 +58,17 @@ const GIT_OWNER_TYPE_ONLY = [
     value: "user",
   },
 ];
+
+const PUBLISH_PLATFORMS = [
+  {
+    name: "OSS",
+    value: "oss",
+  },
+  {
+    name: "Nginx",
+    value: "nginx",
+  },
+];
 export class Git {
   private git: SimpleGit; // git实例，用于git操作
   private name: string; // 待发布项目名称
@@ -65,6 +78,7 @@ export class Git {
   private refreshGitServer: boolean; // 是否刷新本地gitServer缓存
   private refreshGitToken: boolean; // 是否刷新本地gitToken缓存
   private refreshGitOwner: boolean; // 是否刷新本地gitOwner缓存
+  private refreshPlatform: boolean; // 是否刷新本地publishplatform缓存
   private gitServer!: GitServer;
   private user!: ApiResult;
   private orgs!: ApiResult[];
@@ -73,6 +87,8 @@ export class Git {
   private repo: any; // api调用远程仓库拿到的结果
   private remote: string = ""; // 远程仓库的git地址
   private branch: string = ""; // 分支名
+  private platform: string = ""; // 项目发布到哪个平台（默认oss）
+  private prod: boolean; // 是否为生产环境，如果是，则在项目发布后会创建tag并删除开发分支
   constructor({
     name,
     version,
@@ -80,6 +96,8 @@ export class Git {
     refreshGitServer,
     refreshGitToken,
     refreshGitOwner,
+    refreshPlatform,
+    prod,
   }: PublishPrepareInfo & PublishOptions) {
     this.git = simpleGit(dir);
     this.name = name;
@@ -88,6 +106,8 @@ export class Git {
     this.refreshGitServer = !!refreshGitServer;
     this.refreshGitToken = !!refreshGitToken;
     this.refreshGitOwner = !!refreshGitOwner;
+    this.refreshPlatform = !!refreshPlatform;
+    this.prod = !!prod;
   }
 
   async precommit() {
@@ -109,10 +129,12 @@ export class Git {
     await this.pullOriginMatserAndThisBranch();
     await this.pushOrigin(this.branch);
   }
-  async build() {
-    await this.checkBuildDist();
+
+  async publish() {
+    await this.checkLocalBuild();
+    await this.checkPublishPlatform();
+    await this.checkCloudBuild();
   }
-  async publish() {}
 
   async checkGitServer() {
     // 检测使用哪个git平台（默认为github）
@@ -523,25 +545,61 @@ pnpm-debug.log*
     }
   }
 
-  async checkBuildDist() {
-    // 检查是否有 `build` 命令，有则执行
+  async checkLocalBuild() {
+    // 检查是否有 `build` 命令，有则执行，这一步主要是为了检查是否能正确打包（最终构建是在云端）
     const pkg = this.getPackageJson();
     if (!pkg.scripts || !Object.keys(pkg.scripts).includes("build")) {
       throw new Error("`build` script was not found");
     }
     // if (this.buildCmd) {
-    //   require("child_process").execSync(this.buildCmd, {
-    //     cwd: this.dir,
-    //   });
-    // } else {
-    //   require("child_process").execSync("npm run build", {
+    //   execSync(this.buildCmd, {
     //     cwd: this.dir,
     //   });
     // }
     execSync("npm run build", {
       cwd: this.dir,
     });
-    log.success("CheckBuildDist", "Build success");
+    log.success("CheckLocalBuild", "Good, build dist without error");
+  }
+
+  async checkPublishPlatform() {
+    // 检测发布到哪个平台
+    const platformPath = this.createCachePath(PUBLISH_PLATFORM);
+    let platform = readFile(platformPath);
+    if (!platform || this.refreshPlatform) {
+      const res = await inquirer.prompt<{ platform: string }>({
+        name: "platform",
+        type: "list",
+        choices: PUBLISH_PLATFORMS,
+        message: "Please select publish platform",
+      });
+      platform = res.platform;
+      writeFile(platformPath, platform);
+      log.success(
+        "CheckPublishPlatform",
+        `Write ${colors.green(platform)} to ${platformPath} successful`
+      );
+    } else {
+      log.success("CheckPublishPlatform", `Using ${colors.green(platform)}`);
+    }
+    this.platform = platform;
+  }
+
+  async checkCloudBuild() {
+    const cloudBuild = new CloudBuild({
+      prod: this.prod,
+      platform: this.platform,
+      name: this.name,
+      version: this.version,
+      remote: this.remote,
+      branch: this.branch,
+    });
+    await cloudBuild.prepare();
+    await cloudBuild.createWebsocket();
+    // buildRet = await cloudBuild.build();
+    // if (buildRet) {
+    //   await this.uploadTemplate();
+    // }
   }
 
   // 创建本地缓存文件

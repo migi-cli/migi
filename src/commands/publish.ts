@@ -39,10 +39,7 @@ class MigiPublish implements Migi {
     log.info("Step2: Commting", colors.cyan("Code"));
     await git.commit();
 
-    log.info("Step3: Building", colors.cyan("Dist"));
-    await git.build();
-
-    log.info("Step4: Running", colors.cyan("CI/CD"));
+    log.info("Step3: Running", colors.cyan("CI/CD"));
     await git.publish();
 
     const endTime = new Date().getTime();
