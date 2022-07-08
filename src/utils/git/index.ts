@@ -587,7 +587,7 @@ pnpm-debug.log*
 
   async checkCloudBuild() {
     const cloudBuild = new CloudBuild({
-      prod: this.prod,
+      type: this.prod ? "prod" : "dev",
       platform: this.platform,
       name: this.name,
       version: this.version,
@@ -596,7 +596,7 @@ pnpm-debug.log*
     });
     await cloudBuild.prepare();
     await cloudBuild.createWebsocket();
-    // buildRet = await cloudBuild.build();
+    await cloudBuild.build();
     // if (buildRet) {
     //   await this.uploadTemplate();
     // }
