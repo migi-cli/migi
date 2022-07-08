@@ -137,8 +137,12 @@ export default class CloudBuild {
           if (action.includes("start")) {
             loading = ora(message);
             loading.start();
-          } else {
-            loading.succeed();
+          } else if (action.includes("end")) {
+            if (message.includes("成功")) {
+              loading.succeed(message);
+            } else {
+              loading.fail(message);
+            }
           }
         } else {
           loading?.stop();
