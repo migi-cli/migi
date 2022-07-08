@@ -1,30 +1,34 @@
-## migi
 
-> 前端一站式脚手架工具，为项目提供从`初始化、开发到部署`的全流程解决方案
+<div align="center">
+  <h2>migi-cli</h2>
+  <img src="https://raw.githubusercontent.com/tian0o0/pic/master/20220708212912.png" width="120" />
+  <p>前端一站式脚手架工具，为项目提供从初始化、开发到部署的全流程解决方案</p>
+</div>
 
-### 用途
+> 看过《寄生兽》的朋友都知道，ミギ（migi）吃掉了新一的右手并成为了他身体的一部分，从此，普通高中生新一的人生发生了翻天覆地的变化......
 
-- Init
-- Git Flow
-- CI/CD
+### 安装
+```sh
+npm i migi-cli
+```
 
-### 与自动化构建工具的区别
+### 使用方式
 
-> jebkins/travis 等自动化构建工具已经十分成熟，为什么需要自研脚手架？
+**项目初始化**
+```sh
+migi create
+```
+**项目发布**
+```sh
+migi publish
+```
 
-- 不满足需求： jenkins/travis 通常在`git hooks`当中触发，需要在服务端执行，无法覆盖研发人员本地的功能，如：创建项目自动
-  化/本地 git 操作自动化等
-- 定制复杂：jenkins/travis 定制过程需要使用 java 开发插件，对前端不够友好
-
-### TODO
+### ROADMAP
 - [x] 项目初始化
   - [ ] ejs动态渲染
   - [ ] 模版更新判断
-- [ ] 项目发布
-  - [ ] Git Flow自动化
-  - [ ] 云构建CI
-  - [ ] 云发布CD
-
-<!-- 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 -->
-
+- [x] 项目发布
+  - [x] Git Flow自动化
+  - [x] 云构建CI
+  - [x] 云发布CD
 
