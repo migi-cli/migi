@@ -89,6 +89,9 @@ export class Git {
   private branch: string = ""; // 分支名
   private platform: string = ""; // 项目发布到哪个平台（默认oss）
   private prod: boolean; // 是否为生产环境，如果是，则在项目发布后会创建tag并删除开发分支
+  private sshUser?: string;
+  private sshIp?: string;
+  private sshPath?: string;
   constructor({
     name,
     version,
@@ -98,6 +101,9 @@ export class Git {
     refreshGitOwner,
     refreshPlatform,
     prod,
+    sshUser,
+    sshIp,
+    sshPath,
   }: PublishPrepareInfo & PublishOptions) {
     this.git = simpleGit(dir);
     this.name = name;
@@ -108,6 +114,9 @@ export class Git {
     this.refreshGitOwner = !!refreshGitOwner;
     this.refreshPlatform = !!refreshPlatform;
     this.prod = !!prod;
+    this.sshUser = sshUser;
+    this.sshIp = sshIp;
+    this.sshPath = sshPath;
   }
 
   async precommit() {
@@ -597,9 +606,13 @@ pnpm-debug.log*
     await cloudBuild.prepare();
     await cloudBuild.createWebsocket();
     await cloudBuild.build();
-    // if (buildRet) {
-    //   await this.uploadTemplate();
-    // }
+    await this.uploadTemplate();
+  }
+
+  async uploadTemplate() {
+    // 将oss中的index.html下载后上传至nginx服务器（项目打包时公共路径需要设置为oss资源路径）
+    if (this.sshUser && this.sshIp && this.sshPath) {
+    }
   }
 
   // 创建本地缓存文件

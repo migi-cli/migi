@@ -34,6 +34,9 @@ function registerCommand() {
       "Force refresh `~/migi/.git/.gitown` and `~/migi/.git/.gitlogin`"
     )
     .option("--refreshPlatform", "Force refresh `~/migi/.git/.publishplatform`")
+    .option("--sshUser <ssh user>", "ssh user")
+    .option("--sshIp <ssh ip>", "ssh ip")
+    .option("--sshPath <ssh path>", "ssh path")
     .option("--prod", "Publish to production")
 
     .action(publish);

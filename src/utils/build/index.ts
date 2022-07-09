@@ -70,7 +70,6 @@ export default class CloudBuild {
       name: this.name,
       type: this.type,
     });
-    console.log(ossProject);
 
     if (ossProject?.length > 0) {
       const { cover } = await inquirer.prompt<{ cover: boolean }>({

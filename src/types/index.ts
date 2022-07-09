@@ -16,5 +16,8 @@ export interface PublishOptions {
   refreshGitToken?: boolean;
   refreshGitOwner?: boolean;
   refreshPlatform?: boolean;
+  sshUser?: string;
+  sshIp?: string;
+  sshPath?: string;
   prod?: boolean;
 }
