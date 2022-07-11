@@ -31,6 +31,12 @@ interface CloudBuildOptions {
    * 分支名
    */
   branch: string;
+  /**
+   * platform: nginx
+   */
+  sshIp?: string;
+  sshUser?: string;
+  sshPath?: string;
 }
 
 export default class CloudBuild {
@@ -41,6 +47,9 @@ export default class CloudBuild {
   private remote: string;
   private branch: string;
   private socket!: Socket;
+  private sshIp?: string;
+  private sshUser?: string;
+  private sshPath?: string;
   constructor({
     platform,
     type,
@@ -48,6 +57,9 @@ export default class CloudBuild {
     version,
     remote,
     branch,
+    sshIp,
+    sshUser,
+    sshPath,
   }: CloudBuildOptions) {
     this.type = type;
     this.platform = platform;
@@ -55,24 +67,29 @@ export default class CloudBuild {
     this.version = version;
     this.remote = remote;
     this.branch = branch;
+    this.sshIp = sshIp;
+    this.sshUser = sshUser;
+    this.sshPath = sshPath;
   }
 
   async prepare() {
-    // 如果已经发布过项目，那么判断是否需要覆盖
-    const ossProject = await getOSS({
-      name: this.name,
-      type: this.type,
-    });
-
-    if (ossProject?.length > 0) {
-      const { cover } = await inquirer.prompt<{ cover: boolean }>({
-        name: "cover",
-        type: "confirm",
-        message: `Project ${this.name} was existed, force coverage it?`,
-        default: true,
+    if (this.platform === "os") {
+      // 如果已经发布过项目，那么判断是否需要覆盖
+      const ossProject = await getOSS({
+        name: this.name,
+        type: this.type,
       });
-      if (!cover) {
-        throw new Error("Cancel publish");
+
+      if (ossProject?.length > 0) {
+        const { cover } = await inquirer.prompt<{ cover: boolean }>({
+          name: "cover",
+          type: "confirm",
+          message: `Project ${this.name} was existed, force coverage it?`,
+          default: true,
+        });
+        if (!cover) {
+          throw new Error("Cancel publish");
+        }
       }
     }
   }
@@ -87,6 +104,9 @@ export default class CloudBuild {
           version: this.version,
           branch: this.branch,
           remote: this.remote,
+          sshIp: this.sshIp,
+          sshUser: this.sshUser,
+          sshPath: this.sshPath,
         },
         transports: ["websocket"],
       });
@@ -139,6 +159,25 @@ export default class CloudBuild {
           }
         }
       });
+
+      // ssh密码
+      this.socket.on("inputPassword", async (cb) => {
+        loading?.stopAndPersist();
+        let password;
+        while (!password) {
+          const res = await inquirer.prompt<{ password: string }>({
+            name: "password",
+            type: "password",
+            message: "Please input ssh password",
+            default: "",
+          });
+          password = res.password;
+        }
+
+        loading?.start();
+        cb(password);
+      });
+
       // 服务端云构建完成后会自动断开websocket连接
       this.socket.on("disconnect", () => {
         resolve();

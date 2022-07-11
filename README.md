@@ -32,5 +32,5 @@ migi publish
   - [x] 云构建CI
   - [x] 云发布CD
   - [x] 生产环境发布后打tag，删除开发分支
-- [ ] 支持直接上传Nginx
+- [x] 支持直接上传Nginx
 

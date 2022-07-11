@@ -602,6 +602,9 @@ pnpm-debug.log*
       version: this.version,
       remote: this.remote,
       branch: this.branch,
+      sshIp: this.sshIp,
+      sshUser: this.sshUser,
+      sshPath: this.sshPath,
     });
     await cloudBuild.prepare();
     await cloudBuild.createWebsocket();
