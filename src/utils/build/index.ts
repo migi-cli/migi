@@ -2,16 +2,9 @@ import inquirer from "inquirer";
 import ora from "ora";
 import io, { Socket } from "socket.io-client";
 import { log } from "../log";
-import request from "../request";
+import { getOSS } from "../request";
 
 const WS_SERVER = "ws://localhost:3000";
-
-async function getOSSProject(params: any) {
-  return request({
-    url: "/project/oss",
-    params,
-  }) as any;
-}
 
 interface CloudBuildOptions {
   /**
@@ -66,7 +59,7 @@ export default class CloudBuild {
 
   async prepare() {
     // 如果已经发布过项目，那么判断是否需要覆盖
-    const ossProject = await getOSSProject({
+    const ossProject = await getOSS({
       name: this.name,
       type: this.type,
     });
@@ -107,12 +100,6 @@ export default class CloudBuild {
       this.socket.on("connect", () => {
         const id = this.socket.id;
         log.success("Websocket", `Connected. socketID: ${id}`);
-
-        // this.socket.on(id, (msg) => {
-        //   const parsedMsg = parseMsg(msg);
-        //   log.success(parsedMsg.action, parsedMsg.message);
-        //   console.log(msg);
-        // });
         resolve();
       });
       this.socket.on("disconnect", () => {

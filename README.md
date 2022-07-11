@@ -31,6 +31,6 @@ migi publish
   - [x] Git Flow自动化
   - [x] 云构建CI
   - [x] 云发布CD
-  - [ ] 生产环境发布后打tag，删除开发分支
+  - [x] 生产环境发布后打tag，删除开发分支
 - [ ] 支持直接上传Nginx
 

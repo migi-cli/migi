@@ -606,14 +606,66 @@ pnpm-debug.log*
     await cloudBuild.prepare();
     await cloudBuild.createWebsocket();
     await cloudBuild.build();
-    await this.uploadTemplate();
-  }
-
-  async uploadTemplate() {
-    // 将oss中的index.html下载后上传至nginx服务器（项目打包时公共路径需要设置为oss资源路径）
-    if (this.sshUser && this.sshIp && this.sshPath) {
+    if (this.prod) {
+      await this.checkTag(); // 打tag
+      await this.checkoutBranch("master"); // 切换至master分支
+      await this.mergeFromTo(this.version, "master"); // 代码合并至master分支
+      await this.pushOrigin("master"); // 推送至远程master分支
+      await this.deleteLocalBranch(); // 删除本地开发分支
+      await this.deleteRemoteBranch(); // 删除远程开发分支
     }
   }
+
+  async checkTag() {
+    const tag = `${VERSION_RELEASE}/${this.version}`; // release/1.0.0
+    const remoteTagList = await this.getRemoteBranchList(VERSION_RELEASE);
+    if (remoteTagList.includes(this.version)) {
+      // 远程已存在该tag，则删除远程tag
+      await this.git.push(["origin", `:refs/tags/${tag}`]);
+    }
+    console.log("remoteTagList", remoteTagList);
+
+    const localTagList = await this.git.tags();
+    console.log("localTagList", localTagList);
+
+    if (localTagList.all.includes(tag)) {
+      // 本地已存在该tag，则删除本地tag
+      await this.git.tag(["-d", tag]);
+    }
+    await this.git.addTag(tag);
+    await this.git.pushTags("origin");
+    log.success("CheckTag", `New tag ${colors.green(tag)}`);
+  }
+
+  async mergeFromTo(from: string, to: string) {
+    await this.git.mergeFromTo(this.branch, "master");
+    log.success(
+      "MergeFromTo",
+      `Merge branch ${colors.green(from)} into ${colors.green(to)}`
+    );
+  }
+
+  async deleteLocalBranch() {
+    await this.git.deleteLocalBranch(this.branch);
+    log.success(
+      "DeleteLocalBranch",
+      `Local branch ${colors.green(this.branch)} has deleted`
+    );
+  }
+
+  async deleteRemoteBranch() {
+    await this.git.push(["origin", "--delete", this.branch]);
+    log.success(
+      "DeleteLocalBranch",
+      `Remote branch ${colors.green(this.branch)} has deleted`
+    );
+  }
+
+  // async uploadTemplate() {
+  //   // 将oss中的index.html下载后上传至nginx服务器（项目打包时公共路径需要设置为oss资源路径）
+  //   if (this.sshUser && this.sshIp && this.sshPath) {
+  //   }
+  // }
 
   // 创建本地缓存文件
   // ~/.migi/.git/${filename}
