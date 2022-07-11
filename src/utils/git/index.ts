@@ -75,9 +75,7 @@ export class Git {
   private version: string; // 待发布项目版本
   private dir: string; // 待发布项目当前路径
   private cliHome: string = ""; // 本地缓存目录~/.migi
-  private refreshGitServer: boolean; // 是否刷新本地gitServer缓存
-  private refreshGitToken: boolean; // 是否刷新本地gitToken缓存
-  private refreshGitOwner: boolean; // 是否刷新本地gitOwner缓存
+  private refreshGit: boolean; // 是否刷新本地git相关缓存
   private refreshPlatform: boolean; // 是否刷新本地publishplatform缓存
   private gitServer!: GitServer;
   private user!: ApiResult;
@@ -96,9 +94,7 @@ export class Git {
     name,
     version,
     dir,
-    refreshGitServer,
-    refreshGitToken,
-    refreshGitOwner,
+    refreshGit,
     refreshPlatform,
     prod,
     sshUser,
@@ -109,9 +105,7 @@ export class Git {
     this.name = name;
     this.version = version;
     this.dir = dir;
-    this.refreshGitServer = !!refreshGitServer;
-    this.refreshGitToken = !!refreshGitToken;
-    this.refreshGitOwner = !!refreshGitOwner;
+    this.refreshGit = !!refreshGit;
     this.refreshPlatform = !!refreshPlatform;
     this.prod = !!prod;
     this.sshUser = sshUser;
@@ -150,7 +144,7 @@ export class Git {
     const gitServerPath = this.createCachePath(GIT_SERVER_FILE);
     let gitServer = readFile(gitServerPath);
 
-    if (!gitServer || this.refreshGitServer) {
+    if (!gitServer || this.refreshGit) {
       const res = await inquirer.prompt<{ gitServer: string }>({
         name: "gitServer",
         type: "list",
@@ -175,7 +169,7 @@ export class Git {
     // 检测 Git Token, 后续利用该 token 进行操作
     const gitTokenPath = this.createCachePath(GIT_TOKEN_FILE);
     let token = readFile(gitTokenPath);
-    if (!token || this.refreshGitToken) {
+    if (!token || this.refreshGit) {
       log.notice(
         "CheckGitToken",
         `${this.gitServer.type} token was not found, please generate token first.(${this.gitServer.tokenHelpUrl})`
@@ -200,7 +194,9 @@ export class Git {
   async checkUserAndOrgs() {
     // 检测用户/组织是否存在
     this.user = await this.gitServer.getUser();
+    console.log(this.user);
     this.orgs = await this.gitServer.getOrgs();
+    console.log(this.orgs);
     if (!this.user || !this.orgs) {
       throw new Error("Cannot access to user or orgs");
     }
@@ -215,7 +211,7 @@ export class Git {
     const loginPath = this.createCachePath(GIT_LOGIN_FILE);
     let owner = readFile(ownerPath);
     let login = readFile(loginPath);
-    if (!owner || !login || this.refreshGitOwner) {
+    if (!owner || !login || this.refreshGit) {
       const res = await inquirer.prompt<{ owner: string }>({
         name: "owner",
         type: "list",
@@ -258,6 +254,7 @@ export class Git {
   async checkRepo() {
     // 根据用户输入获取当前项目的仓库信息，如果没有则自动创建
     let repo = await this.gitServer.getRepo(this.login, this.name);
+
     if (!repo) {
       const loading = ora(`Creating Remote repo: ${colors.green(this.name)}`);
       loading.start();
@@ -627,7 +624,6 @@ pnpm-debug.log*
       await this.git.push(["origin", `:refs/tags/${tag}`]);
     }
     console.log("remoteTagList", remoteTagList);
-
     const localTagList = await this.git.tags();
     console.log("localTagList", localTagList);
 

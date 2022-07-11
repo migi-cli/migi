@@ -12,9 +12,7 @@ export interface PublishPrepareInfo {
 }
 
 export interface PublishOptions {
-  refreshGitServer?: boolean;
-  refreshGitToken?: boolean;
-  refreshGitOwner?: boolean;
+  refreshGit?: boolean;
   refreshPlatform?: boolean;
   sshUser?: string;
   sshIp?: string;

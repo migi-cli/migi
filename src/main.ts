@@ -31,18 +31,15 @@ function registerCommand() {
   cli
     .command("publish", "[Publish project]")
     .alias("p")
-    .option("--refreshGitServer", "Force refresh `~/migi/.git/.gitserver`")
-    .option("--refreshGitToken", "Force refresh `~/migi/.git/.gittoken`")
     .option(
-      "--refreshGitOwner",
-      "Force refresh `~/migi/.git/.gitown` and `~/migi/.git/.gitlogin`"
+      "--refreshGit",
+      "Force refresh `~/migi/.git/.gitserver`/`~/migi/.git/.gittoken`/`~/migi/.git/.gitown`/`~/migi/.git/.gittoken`"
     )
     .option("--refreshPlatform", "Force refresh `~/migi/.git/.publishplatform`")
     .option("--sshUser <ssh user>", "ssh user")
     .option("--sshIp <ssh ip>", "ssh ip")
     .option("--sshPath <ssh path>", "ssh path")
     .option("--prod", "Publish to production")
-
     .action(publish);
 
   cli.help();
