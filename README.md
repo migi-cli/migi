@@ -25,12 +25,18 @@ migi publish
 
 ### ROADMAP
 - [x] 项目初始化
-  - [x] ejs动态渲染
+  - [x] EJS动态渲染
   - [x] 强制更新模版
 - [x] 项目发布
-  - [x] Git Flow自动化
-  - [x] 云构建CI
-  - [x] 云发布CD
+  - [x] GitFlow自动化
+  - [x] 持续集成CI
+  - [x] 持续部署CD
   - [x] 生产环境发布后打tag，删除开发分支
-- [x] 支持直接上传Nginx
+  - [x] 可选静态资源发布平台
+    - [x] OSS
+    - [x] Nginx
+  - [x] 可选Git Server
+    - [x] Github
+    - [ ] Gitlab
+    - [ ] Gitee
 
