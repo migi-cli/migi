@@ -3,14 +3,15 @@ import { promisify } from "util";
 import path from "path";
 import fse from "fs-extra";
 import { homedir } from "os";
-import { log, useRequest } from "../utils";
-import { Migi } from "../types";
 import ora from "ora";
+import { log, useRequest, renderEjs } from "../utils";
+import { Migi } from "../types";
 const downloadGitRepo = promisify(require("download-git-repo"));
 const userHome = homedir();
 
 export interface CreateOptions {
   org: string;
+  refreshTemplate?: boolean;
 }
 
 export interface CreatePrepareInfo {
@@ -55,7 +56,7 @@ class MigiCreate implements Migi {
   async exec() {
     await this.download();
     const ok = await this.copy();
-    ok && this.renderEjs();
+    ok && this.writeFile();
   }
   async afterExec() {}
 
@@ -66,7 +67,7 @@ class MigiCreate implements Migi {
 
     const cachePath = path.join(userHome, process.env.MIGI_CLI_HOME!, template);
 
-    if (!fse.pathExistsSync(cachePath)) {
+    if (!fse.pathExistsSync(cachePath) || this.options.refreshTemplate) {
       const loading = ora("Downloading repo");
       loading.start();
       try {
@@ -94,29 +95,10 @@ class MigiCreate implements Migi {
     }
   }
 
-  renderEjs() {
-    const { name, author, description, version } = this.prepareInfo;
-    const packagejsonPath = path.join(process.cwd(), `${name}/package.json`);
-
-    const packageJson = Object.assign(require(packagejsonPath), {
-      name: name,
-      author: author,
-      description: description,
-      version: version,
-    });
-    fse.outputFileSync(packagejsonPath, JSON.stringify(packageJson, null, 2));
-
-    const readmePath = path.join(process.cwd(), `./${name}/README.md`);
-
-    const data = fse
-      .readFileSync(readmePath)
-      .toString()
-      .replace("PROJECT_NAME", name)
-      .replace("DESCRIPTION", description);
-
-    fse.outputFileSync(readmePath, data);
-
-    log.success("Create", path.join(process.cwd(), name));
+  async writeFile() {
+    // ejs批量替换模板
+    await renderEjs(process.cwd(), this.prepareInfo);
+    log.success("Create", path.join(process.cwd(), this.prepareInfo.name));
   }
 }
 

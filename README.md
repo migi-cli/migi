@@ -25,8 +25,8 @@ migi publish
 
 ### ROADMAP
 - [x] 项目初始化
-  - [ ] ejs动态渲染
-  - [ ] 模版更新判断
+  - [x] ejs动态渲染
+  - [x] 强制更新模版
 - [x] 项目发布
   - [x] Git Flow自动化
   - [x] 云构建CI

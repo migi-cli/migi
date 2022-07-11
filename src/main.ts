@@ -22,6 +22,10 @@ function registerCommand() {
     .option("--org <orgName>", "Github Org Name", {
       default: DEFAULT_ORG,
     })
+    .option(
+      "--refreshTemplate",
+      "Force use remote template instead of local cache"
+    )
     .action(create);
 
   cli
