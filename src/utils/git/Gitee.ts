@@ -9,6 +9,9 @@ export default class Gitee extends GitServer {
   get tokenHelpUrl(): string {
     return "https://gitee.com/profile/personal_access_tokens";
   }
+  setToken(token: string): void {
+    this.request = new GiteeRequest(token);
+  }
   getUser() {
     return this.request.get("/user").then((response: ApiResult) => {
       return response;
@@ -50,8 +53,5 @@ export default class Gitee extends GitServer {
   }
   getSSHKeysHelpUrl(): string {
     return "https://gitee.com/help/articles/4191";
-  }
-  setToken(token: string): void {
-    this.request = new GiteeRequest(token);
   }
 }

@@ -37,6 +37,6 @@ migi publish
     - [x] Nginx
   - [x] 可选Git Server
     - [x] Github
-    - [ ] Gitlab
-    - [ ] Gitee
+    - [x] Gitee
+    - [x] Gitlab
 

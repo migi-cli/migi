@@ -1,38 +1,67 @@
 import GitServer from "./GitServer";
 import { ApiResult } from "./request";
+import GitlabRequest from "./request/Gitlab";
 
 export default class Gitlab extends GitServer {
   constructor() {
     super("gitlab");
   }
   get tokenHelpUrl(): string {
-    throw new Error("Method not implemented.");
+    return "https://git.133ec.com/profile/personal_access_tokens";
+  }
+  setToken(token: string): void {
+    this.request = new GitlabRequest(token);
   }
   getUser() {
-    return {} as ApiResult;
+    return this.request.get("/user").then((response: ApiResult) => {
+      return {
+        login: response.username,
+        id: response.id,
+      };
+    });
   }
   getOrgs() {
-    return {} as ApiResult[];
+    return this.request
+      .get("/groups", {
+        all_available: true,
+        per_page: 100,
+      })
+      .then((response: ApiResult[]) => {
+        return response?.map((item) => ({
+          login: item.name,
+          id: item.id,
+        }));
+      });
   }
-  getRepo(): void {
-    throw new Error("Method not implemented.");
+  getRepo(owner: string, repo: string) {
+    return this.request
+      .get("/projects", {
+        search: repo,
+      })
+      .then((response: ApiResult[]) => {
+        return response?.length
+          ? response.filter((item) => item.namespace.kind === owner)
+          : [];
+      });
   }
-  createRepo(): void {
-    throw new Error("Method not implemented.");
+  createRepo(name: string) {
+    return this.request.post("/projects", {
+      name,
+    });
   }
-  createOrgRepo(): void {
-    throw new Error("Method not implemented.");
+  createOrgRepo(login: string, name: string) {
+    return this.request.post("/projects", {
+      name,
+      namespace_id: login,
+    });
   }
   getRemote(login: string, name: string) {
-    return "";
+    return `http://git@git.133ec.com/${login}/${name}.git`;
   }
   getSSHKeysUrl(): string {
-    throw new Error("Method not implemented.");
+    return "https://git.133ec.com/profile/keys";
   }
   getSSHKeysHelpUrl(): string {
-    throw new Error("Method not implemented.");
-  }
-  setToken(): void {
-    throw new Error("Method not implemented.");
+    return "https://git.133ec.com/help/ssh/README";
   }
 }

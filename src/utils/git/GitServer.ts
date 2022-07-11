@@ -13,7 +13,7 @@ export default abstract class GitServer {
   abstract getOrgs(): ApiResult[];
   abstract getRepo(owner: string, repo: string): any;
   abstract createRepo(name: string): any;
-  abstract createOrgRepo(login: string, name: string): any;
+  abstract createOrgRepo(login: string | number, name: string): any;
   abstract getRemote(login: string, name: string): string;
   abstract getSSHKeysUrl(): string;
   abstract getSSHKeysHelpUrl(): string;

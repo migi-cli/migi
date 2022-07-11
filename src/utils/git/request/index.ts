@@ -1,8 +1,14 @@
 import { AxiosInstance } from "axios";
 
 export interface ApiResult {
-  login: string;
   id: number;
+  login: string; // github/gitee
+  username: string; // gitlab
+  name: string; // gitlab
+  // gitlab
+  namespace: {
+    kind: string;
+  };
 }
 
 export interface Request {

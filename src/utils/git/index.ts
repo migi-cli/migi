@@ -82,6 +82,7 @@ export class Git {
   private orgs!: ApiResult[];
   private owner: string = "user"; // 个人或组织
   private login: string = ""; // 账户名或组织名
+  private loginId?: number; // gitlab groups id
   private repo: any; // api调用远程仓库拿到的结果
   private remote: string = ""; // 远程仓库的git地址
   private branch: string = ""; // 分支名
@@ -111,6 +112,10 @@ export class Git {
     this.sshUser = sshUser;
     this.sshIp = sshIp;
     this.sshPath = sshPath;
+  }
+
+  get isGitlab(): boolean {
+    return this.gitServer.type === "gitlab";
   }
 
   async precommit() {
@@ -194,9 +199,7 @@ export class Git {
   async checkUserAndOrgs() {
     // 检测用户/组织是否存在
     this.user = await this.gitServer.getUser();
-    console.log(this.user);
     this.orgs = await this.gitServer.getOrgs();
-    console.log(this.orgs);
     if (!this.user || !this.orgs) {
       throw new Error("Cannot access to user or orgs");
     }
@@ -222,7 +225,7 @@ export class Git {
       if (owner === "user") {
         login = this.user.login;
       } else {
-        const res2 = await inquirer.prompt<{ login: string }>({
+        const res = await inquirer.prompt<{ login: string }>({
           name: "login",
           type: "list",
           choices: this.orgs.map((item) => ({
@@ -231,7 +234,11 @@ export class Git {
           })),
           message: "Please Select org",
         });
-        login = res2.login;
+
+        login = res.login;
+        if (this.isGitlab) {
+          this.loginId = this.orgs.find((item) => item.login === login)?.id;
+        }
       }
       writeFile(ownerPath, owner);
       writeFile(loginPath, login);
@@ -253,16 +260,22 @@ export class Git {
 
   async checkRepo() {
     // 根据用户输入获取当前项目的仓库信息，如果没有则自动创建
-    let repo = await this.gitServer.getRepo(this.login, this.name);
+    let repo = await this.gitServer.getRepo(
+      this.isGitlab ? this.owner : this.login,
+      this.name
+    );
 
-    if (!repo) {
+    if (!repo || !repo.length) {
       const loading = ora(`Creating Remote repo: ${colors.green(this.name)}`);
       loading.start();
       try {
         if (this.owner === "user") {
           repo = await this.gitServer.createRepo(this.name);
         } else {
-          repo = await this.gitServer.createOrgRepo(this.login, this.name);
+          repo = await this.gitServer.createOrgRepo(
+            this.isGitlab ? this.loginId! : this.login,
+            this.name
+          );
         }
       } catch (e) {
         loading.fail("Remote repo created fail");
@@ -609,7 +622,7 @@ pnpm-debug.log*
     if (this.prod) {
       await this.checkTag(); // 打tag
       await this.checkoutBranch("master"); // 切换至master分支
-      await this.mergeFromTo(this.version, "master"); // 代码合并至master分支
+      await this.mergeFromTo(this.branch, "master"); // 代码合并至master分支
       await this.pushOrigin("master"); // 推送至远程master分支
       await this.deleteLocalBranch(); // 删除本地开发分支
       await this.deleteRemoteBranch(); // 删除远程开发分支
@@ -637,7 +650,7 @@ pnpm-debug.log*
   }
 
   async mergeFromTo(from: string, to: string) {
-    await this.git.mergeFromTo(this.branch, "master");
+    await this.git.mergeFromTo(from, "master");
     log.success(
       "MergeFromTo",
       `Merge branch ${colors.green(from)} into ${colors.green(to)}`
