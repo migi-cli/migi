@@ -48,8 +48,6 @@ class MigiCreate implements Migi {
       "Loading template"
     );
 
-    data = data.filter((repo) => repo.name !== "xietian-cli");
-
     const questions = genQuestions(data);
     this.prepareInfo = await inquirer.prompt<CreatePrepareInfo>(questions);
   }
