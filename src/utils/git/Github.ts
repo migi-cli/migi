@@ -30,7 +30,9 @@ export default class Github extends GitServer {
   }
   getRepo(owner: string, repo: string) {
     return this.request.get(`/repos/${owner}/${repo}`).then((response: any) => {
-      return response.status === 404 ? null : response;
+      return typeof response === "string" && response.includes("Not Found")
+        ? null
+        : response;
     });
   }
   createRepo(name: string) {

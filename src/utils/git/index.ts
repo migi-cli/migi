@@ -264,8 +264,7 @@ export class Git {
       this.isGitlab ? this.owner : this.login,
       this.name
     );
-
-    if (!repo || !repo.length) {
+    if (!repo || (Array.isArray(repo) && !repo.length)) {
       const loading = ora(`Creating Remote repo: ${colors.green(this.name)}`);
       loading.start();
       try {
@@ -441,7 +440,9 @@ pnpm-debug.log*
       releaseVersion = remoteBranchList[0];
     }
     const devVersion = this.version;
-    if (!releaseVersion || semver.gt(this.version, releaseVersion)) {
+    console.log(devVersion, releaseVersion);
+
+    if (!releaseVersion || semver.gt(devVersion, releaseVersion)) {
       this.branch = `${VERSION_DEVELOP}/${devVersion}`;
     } else {
       const { releaseType } = await inquirer.prompt<{
