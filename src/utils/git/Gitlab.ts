@@ -56,7 +56,7 @@ export default class Gitlab extends GitServer {
     });
   }
   getRemote(login: string, name: string) {
-    return `http://git@git.133ec.com/${login}/${name}.git`;
+    return `ssh://git@git.133ec.com:20022/${login}/${name}.git`;
   }
   getSSHKeysUrl(): string {
     return "https://git.133ec.com/profile/keys";

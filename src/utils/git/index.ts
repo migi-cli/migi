@@ -75,8 +75,9 @@ export class Git {
   private version: string; // 待发布项目版本
   private dir: string; // 待发布项目当前路径
   private cliHome: string = ""; // 本地缓存目录~/.migi
-  private refreshGit: boolean; // 是否刷新本地git相关缓存
-  private refreshPlatform: boolean; // 是否刷新本地publishplatform缓存
+  private reset: boolean;
+  private resetGit: boolean; // 是否刷新本地git相关缓存
+  private resetPlatform: boolean; // 是否刷新本地publishplatform缓存
   private gitServer!: GitServer;
   private user!: ApiResult;
   private orgs!: ApiResult[];
@@ -95,8 +96,9 @@ export class Git {
     name,
     version,
     dir,
-    refreshGit,
-    refreshPlatform,
+    reset,
+    resetGit,
+    resetPlatform,
     prod,
     sshUser,
     sshIp,
@@ -106,8 +108,9 @@ export class Git {
     this.name = name;
     this.version = version;
     this.dir = dir;
-    this.refreshGit = !!refreshGit;
-    this.refreshPlatform = !!refreshPlatform;
+    this.reset = !!reset;
+    this.resetGit = !!resetGit;
+    this.resetPlatform = !!resetPlatform;
     this.prod = !!prod;
     this.sshUser = sshUser;
     this.sshIp = sshIp;
@@ -149,7 +152,7 @@ export class Git {
     const gitServerPath = this.createCachePath(GIT_SERVER_FILE);
     let gitServer = readFile(gitServerPath);
 
-    if (!gitServer || this.refreshGit) {
+    if (!gitServer || this.resetGit || this.reset) {
       const res = await inquirer.prompt<{ gitServer: string }>({
         name: "gitServer",
         type: "list",
@@ -174,7 +177,7 @@ export class Git {
     // 检测 Git Token, 后续利用该 token 进行操作
     const gitTokenPath = this.createCachePath(GIT_TOKEN_FILE);
     let token = readFile(gitTokenPath);
-    if (!token || this.refreshGit) {
+    if (!token || this.resetGit || this.reset) {
       log.notice(
         "CheckGitToken",
         `${this.gitServer.type} token was not found, please generate token first.(${this.gitServer.tokenHelpUrl})`
@@ -214,7 +217,7 @@ export class Git {
     const loginPath = this.createCachePath(GIT_LOGIN_FILE);
     let owner = readFile(ownerPath);
     let login = readFile(loginPath);
-    if (!owner || !login || this.refreshGit) {
+    if (!owner || !login || this.resetGit || this.reset) {
       const res = await inquirer.prompt<{ owner: string }>({
         name: "owner",
         type: "list",
@@ -586,7 +589,7 @@ pnpm-debug.log*
     // 检测发布到哪个平台
     const platformPath = this.createCachePath(PUBLISH_PLATFORM);
     let platform = readFile(platformPath);
-    if (!platform || this.refreshPlatform) {
+    if (!platform || this.resetPlatform || this.reset) {
       const res = await inquirer.prompt<{ platform: string }>({
         name: "platform",
         type: "list",

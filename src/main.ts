@@ -31,11 +31,12 @@ function registerCommand() {
   cli
     .command("publish", "[Publish project]")
     .alias("p")
+    .option("--reset", "Reset both `git config` and `publish platform`")
     .option(
-      "--refreshGit",
-      "Force refresh `~/migi/.git/.gitserver`/`~/migi/.git/.gittoken`/`~/migi/.git/.gitown`/`~/migi/.git/.gittoken`"
+      "--resetGit",
+      "Reset `~/migi/.git/.gitserver`/`~/migi/.git/.gittoken`/`~/migi/.git/.gitown`/`~/migi/.git/.gittoken`"
     )
-    .option("--refreshPlatform", "Force refresh `~/migi/.git/.publishplatform`")
+    .option("--resetPlatform", "Reset `~/migi/.git/.publishplatform`")
     .option("--sshUser <ssh user>", "ssh user")
     .option("--sshIp <ssh ip>", "ssh ip")
     .option("--sshPath <ssh path>", "ssh path")
