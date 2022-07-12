@@ -222,6 +222,7 @@ export class Git {
         message: "Please select owner type",
       });
       owner = res.owner;
+
       if (owner === "user") {
         login = this.user.login;
       } else {
@@ -440,7 +441,6 @@ pnpm-debug.log*
       releaseVersion = remoteBranchList[0];
     }
     const devVersion = this.version;
-    console.log(devVersion, releaseVersion);
 
     if (!releaseVersion || semver.gt(devVersion, releaseVersion)) {
       this.branch = `${VERSION_DEVELOP}/${devVersion}`;
@@ -637,9 +637,7 @@ pnpm-debug.log*
       // 远程已存在该tag，则删除远程tag
       await this.git.push(["origin", `:refs/tags/${tag}`]);
     }
-    console.log("remoteTagList", remoteTagList);
     const localTagList = await this.git.tags();
-    console.log("localTagList", localTagList);
 
     if (localTagList.all.includes(tag)) {
       // 本地已存在该tag，则删除本地tag
@@ -669,7 +667,7 @@ pnpm-debug.log*
   async deleteRemoteBranch() {
     await this.git.push(["origin", "--delete", this.branch]);
     log.success(
-      "DeleteLocalBranch",
+      "DeleteRemoteBranch",
       `Remote branch ${colors.green(this.branch)} has deleted`
     );
   }

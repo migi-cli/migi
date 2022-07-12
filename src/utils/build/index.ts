@@ -3,8 +3,8 @@ import ora from "ora";
 import io, { Socket } from "socket.io-client";
 import { log } from "../log";
 import { getOSS } from "../request";
-
-const WS_SERVER = "ws://localhost:3000";
+import { HOST, PORT } from "../../config";
+const WS_SERVER = `ws://${HOST}:${PORT}`;
 
 interface CloudBuildOptions {
   /**
@@ -119,7 +119,7 @@ export default class CloudBuild {
 
       this.socket.on("connect", () => {
         const id = this.socket.id;
-        log.success("Websocket", `Connected. socketID: ${id}`);
+        log.success("Websocket", `Connect to ${WS_SERVER}. socketID: ${id}`);
         resolve();
       });
       this.socket.on("disconnect", () => {

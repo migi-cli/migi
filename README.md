@@ -7,31 +7,16 @@
 
 > 看过《寄生兽》的朋友都知道，ミギ（migi）吃掉了新一的右手并成为了他身体的一部分，从此，普通高中生新一的人生发生了翻天覆地的变化......
 
-### 安装
-```sh
-npm i migi-cli
-```
-
-### 使用方式
-
-**项目初始化**
-```sh
-migi create
-```
-**项目发布**
-```sh
-migi publish
-```
-
-### ROADMAP
-- [x] 项目初始化
+### 特性
+- [x] :tada: 项目初始化
+  - [x] 开箱即用的项目模板
   - [x] EJS动态渲染
-  - [x] 强制更新模版
-- [x] 项目发布
+  - [x] 支持模板缓存以及强制更新模版
+- [x] :tada: 项目发布
   - [x] GitFlow自动化
   - [x] 持续集成CI
   - [x] 持续部署CD
-  - [x] 生产环境发布后打tag，删除开发分支
+  - [x] 支持配置缓存以及强制更新配置
   - [x] 可选静态资源发布平台
     - [x] OSS
     - [x] Nginx
@@ -39,4 +24,32 @@ migi publish
     - [x] Github
     - [x] Gitee
     - [x] Gitlab
+
+### 安装
+```sh
+npm i migi-cli -g
+```
+### 使用方式
+
+**项目初始化**
+```sh
+migi create
+
+# 别名
+migi c
+
+# 更多使用方式
+migi create -h
+```
+**项目发布**
+```sh
+migi publish
+
+# 别名
+migi p
+
+# 更多使用方式
+migi publish -h
+```
+
 

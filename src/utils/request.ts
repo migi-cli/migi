@@ -1,6 +1,6 @@
 import axios from "axios";
-
-const BASE_URL = "http://localhost:3000";
+import { HOST, PORT } from "../config";
+const BASE_URL = `http://${HOST}:${PORT}`;
 
 const request = axios.create({
   baseURL: BASE_URL,
