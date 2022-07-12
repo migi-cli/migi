@@ -1,5 +1,5 @@
 {
-  "name": "migi",
+  "name": "migi-cli",
   "version": "1.0.0",
   "description": "",
   "main": "bin/dist.js",

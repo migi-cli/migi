@@ -15,6 +15,6 @@ export default {
             useTsconfigDeclarationDir: true
         }),
         json(),
-        // terser()
+        terser()
     ]
 }
