@@ -2,14 +2,18 @@ import path from "path";
 import colors from "colors";
 import fse from "fs-extra";
 import { Migi, PublishOptions, PublishPrepareInfo } from "../types";
-import { Git, log } from "../utils";
+import { Git, log, readMigirc } from "../utils";
 
 class MigiPublish implements Migi {
   private options: PublishOptions;
   private prepareInfo: PublishPrepareInfo = {} as PublishPrepareInfo;
 
   constructor(options: PublishOptions) {
-    this.options = options;
+    const staticConfig = readMigirc();
+    this.options = {
+      ...staticConfig,
+      ...options,
+    };
     this.init();
   }
 

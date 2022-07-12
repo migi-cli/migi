@@ -1,6 +1,6 @@
 {
   "name": "migi-cli",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "",
   "main": "bin/dist.js",
   "bin": {
@@ -9,6 +9,10 @@
   "files": [
     "bin"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/migi-cli/migi"
+  },
   "scripts": {
     "start": "rollup -c --watch",
     "build": "rollup -c"

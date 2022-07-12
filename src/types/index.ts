@@ -11,12 +11,17 @@ export interface PublishPrepareInfo {
   dir: string;
 }
 
-export interface PublishOptions {
+export interface BasePublishOptions {
   reset?: boolean;
   resetGit?: boolean;
   resetPlatform?: boolean;
+  prod?: boolean;
+}
+
+export interface SSHOptions {
   sshUser?: string;
   sshIp?: string;
   sshPath?: string;
-  prod?: boolean;
 }
+
+export type PublishOptions = BasePublishOptions & SSHOptions;
