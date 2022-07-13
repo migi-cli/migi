@@ -268,6 +268,7 @@ export class Git {
       this.isGitlab ? this.owner : this.login,
       this.name
     );
+
     if (!repo || (Array.isArray(repo) && !repo.length)) {
       const loading = ora(`Creating Remote repo: ${colors.green(this.name)}`);
       loading.start();

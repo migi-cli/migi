@@ -34,6 +34,9 @@ export default class Gitlab extends GitServer {
       });
   }
   getRepo(owner: string, repo: string) {
+    if (owner === "org") {
+      owner = "group";
+    }
     return this.request
       .get("/projects", {
         search: repo,
