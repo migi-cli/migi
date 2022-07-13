@@ -20,6 +20,7 @@ export interface BasePublishOptions {
 
 export interface SSHOptions {
   sshUser?: string;
+  sshPassword?: string;
   sshIp?: string;
   sshPath?: string;
 }

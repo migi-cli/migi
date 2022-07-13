@@ -38,6 +38,7 @@ function registerCommand() {
     )
     .option("--resetPlatform", "Reset `~/migi/.git/.publishplatform`")
     .option("--sshUser <ssh user>", "ssh user")
+    .option("--sshPassword <ssh password>", "ssh password")
     .option("--sshIp <ssh ip>", "ssh ip")
     .option("--sshPath <ssh path>", "ssh path")
     .option("--prod", "Publish to production")

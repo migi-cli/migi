@@ -90,6 +90,7 @@ export class Git {
   private platform: string = ""; // 项目发布到哪个平台（默认oss）
   private prod: boolean; // 是否为生产环境，如果是，则在项目发布后会创建tag并删除开发分支
   private sshUser?: string;
+  private sshPassword?: string;
   private sshIp?: string;
   private sshPath?: string;
   constructor({
@@ -101,6 +102,7 @@ export class Git {
     resetPlatform,
     prod,
     sshUser,
+    sshPassword,
     sshIp,
     sshPath,
   }: PublishPrepareInfo & PublishOptions) {
@@ -113,6 +115,7 @@ export class Git {
     this.resetPlatform = !!resetPlatform;
     this.prod = !!prod;
     this.sshUser = sshUser;
+    this.sshPassword = sshPassword;
     this.sshIp = sshIp;
     this.sshPath = sshPath;
   }
@@ -619,6 +622,7 @@ pnpm-debug.log*
       branch: this.branch,
       sshIp: this.sshIp,
       sshUser: this.sshUser,
+      sshPassword: this.sshPassword,
       sshPath: this.sshPath,
     });
     await cloudBuild.prepare();

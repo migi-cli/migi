@@ -97,8 +97,9 @@ class MigiCreate implements Migi {
 
   async writeFile() {
     // ejs批量替换模板
-    await renderEjs(process.cwd(), this.prepareInfo);
-    log.success("Create", path.join(process.cwd(), this.prepareInfo.name));
+    const projectPath = path.resolve(process.cwd(), this.prepareInfo.name);
+    await renderEjs(projectPath, this.prepareInfo);
+    log.success("Create", projectPath);
   }
 }
 

@@ -4,9 +4,10 @@ import io, { Socket } from "socket.io-client";
 import { log } from "../log";
 import { getOSS } from "../request";
 import { HOST, PORT } from "../../config";
+import { SSHOptions } from "../../types";
 const WS_SERVER = `ws://${HOST}:${PORT}`;
 
-interface CloudBuildOptions {
+type CloudBuildOptions = SSHOptions & {
   /**
    * prod/dev
    */
@@ -31,13 +32,7 @@ interface CloudBuildOptions {
    * 分支名
    */
   branch: string;
-  /**
-   * platform: nginx
-   */
-  sshIp?: string;
-  sshUser?: string;
-  sshPath?: string;
-}
+};
 
 export default class CloudBuild {
   private type: string;
@@ -49,6 +44,7 @@ export default class CloudBuild {
   private socket!: Socket;
   private sshIp?: string;
   private sshUser?: string;
+  private sshPassword?: string;
   private sshPath?: string;
   constructor({
     platform,
@@ -59,6 +55,7 @@ export default class CloudBuild {
     branch,
     sshIp,
     sshUser,
+    sshPassword,
     sshPath,
   }: CloudBuildOptions) {
     this.type = type;
@@ -69,6 +66,7 @@ export default class CloudBuild {
     this.branch = branch;
     this.sshIp = sshIp;
     this.sshUser = sshUser;
+    this.sshPassword = sshPassword;
     this.sshPath = sshPath;
   }
 
@@ -106,6 +104,7 @@ export default class CloudBuild {
           remote: this.remote,
           sshIp: this.sshIp,
           sshUser: this.sshUser,
+          sshPassword: this.sshPassword,
           sshPath: this.sshPath,
         },
         transports: ["websocket"],
@@ -160,23 +159,23 @@ export default class CloudBuild {
         }
       });
 
-      // ssh密码
-      this.socket.on("inputPassword", async (cb) => {
-        loading?.stopAndPersist();
-        let password;
-        while (!password) {
-          const res = await inquirer.prompt<{ password: string }>({
-            name: "password",
-            type: "password",
-            message: "Please input ssh password",
-            default: "",
-          });
-          password = res.password;
-        }
+      // ssh密码(废弃，采用配置的方式)
+      // this.socket.on("inputPassword", async (cb) => {
+      //   loading?.stopAndPersist();
+      //   let password;
+      //   while (!password) {
+      //     const res = await inquirer.prompt<{ password: string }>({
+      //       name: "password",
+      //       type: "password",
+      //       message: "Please input ssh password",
+      //       default: "",
+      //     });
+      //     password = res.password;
+      //   }
 
-        loading?.start();
-        cb(password);
-      });
+      //   loading?.start();
+      //   cb(password);
+      // });
 
       // 服务端云构建完成后会自动断开websocket连接
       this.socket.on("disconnect", () => {
