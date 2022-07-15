@@ -17,7 +17,7 @@ export default async function prepare() {
     checkRoot(); // process.geteuid() 普通启动为501，sudo启动为0，root-check会自动降级，防止出现文件读写异常
     checkHome();
     checkEnv();
-    // await checkUpdate();
+    await checkUpdate();
   } catch (e: any) {
     throw new Error(e.message || "Enviorment prepare failed");
   }
