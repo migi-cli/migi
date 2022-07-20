@@ -34,8 +34,9 @@ function registerCommand() {
     .option("--reset", "Reset both `git config` and `publish platform`")
     .option(
       "--resetGit",
-      "Reset `~/migi/.git/.gitserver`/`~/migi/.git/.gittoken`/`~/migi/.git/.gitown`/`~/migi/.git/.gittoken`"
+      "Reset `~/migi/.git/.gitserver`/`~/migi/.git/.gittoken`/`~/migi/.git/.gitown`"
     )
+    .option("--resetGitOwn", "Reset `~/migi/.git/.gitown`")
     .option("--resetPlatform", "Reset `~/migi/.git/.publishplatform`")
     .option("--sshUser <ssh user>", "ssh user")
     .option("--sshPassword <ssh password>", "ssh password")

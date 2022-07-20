@@ -77,6 +77,7 @@ export class Git {
   private cliHome: string = ""; // 本地缓存目录~/.migi
   private reset: boolean;
   private resetGit: boolean; // 是否刷新本地git相关缓存
+  private resetGitOwn: boolean; // 是否刷新本地gitown(在不刷新gitserver及gittoken时方便切换待发布项目)
   private resetPlatform: boolean; // 是否刷新本地publishplatform缓存
   private gitServer!: GitServer;
   private user!: ApiResult;
@@ -99,6 +100,7 @@ export class Git {
     dir,
     reset,
     resetGit,
+    resetGitOwn,
     resetPlatform,
     prod,
     sshUser,
@@ -112,6 +114,7 @@ export class Git {
     this.dir = dir;
     this.reset = !!reset;
     this.resetGit = !!resetGit;
+    this.resetGitOwn = !!resetGitOwn;
     this.resetPlatform = !!resetPlatform;
     this.prod = !!prod;
     this.sshUser = sshUser;
@@ -220,7 +223,7 @@ export class Git {
     const loginPath = this.createCachePath(GIT_LOGIN_FILE);
     let owner = readFile(ownerPath);
     let login = readFile(loginPath);
-    if (!owner || !login || this.resetGit || this.reset) {
+    if (!owner || !login || this.resetGitOwn || this.resetGit || this.reset) {
       const res = await inquirer.prompt<{ owner: string }>({
         name: "owner",
         type: "list",
