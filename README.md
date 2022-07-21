@@ -1,11 +1,11 @@
 
-<div align="center">
-  <h2>migi-cli</h2>
-  <img src="https://raw.githubusercontent.com/tian0o0/pic/master/20220708212912.png" width="120" />
-  <p>前端一站式脚手架工具，为项目提供从初始化、开发到部署的全流程解决方案</p>
-</div>
+## migi-cli
 
-> 看过《寄生兽》的朋友都知道，ミギ（migi）吃掉了新一的右手并成为了他身体的一部分，从此，普通高中生新一的人生发生了翻天覆地的变化......
+:tada: **前端一站式脚手架工具，为项目提供从初始化、标准化GitFlow到自定义部署的全流程解决方案**
+
+<div align="center">
+  <img src="https://raw.githubusercontent.com/tian0o0/pic/master/20220708212912.png" width="80" />
+</div>
 
 ### 特性
 - [x] 项目初始化 :tada: 

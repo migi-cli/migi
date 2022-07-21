@@ -28,6 +28,10 @@ const VERSION_DEVELOP = "dev"; // dev分支名
 type Version = typeof VERSION_RELEASE | typeof VERSION_DEVELOP;
 const GIT_SERVER_LIST = [
   {
+    name: "Gitlab",
+    value: "gitlab",
+  },
+  {
     name: "Github",
     value: "github",
   },
@@ -35,20 +39,16 @@ const GIT_SERVER_LIST = [
     name: "Gitee",
     value: "gitee",
   },
-  {
-    name: "Gitlab",
-    value: "gitlab",
-  },
 ];
 
 const GIT_OWNER_TYPE = [
   {
-    name: "User",
-    value: "user",
-  },
-  {
     name: "Org",
     value: "org",
+  },
+  {
+    name: "User",
+    value: "user",
   },
 ];
 
@@ -61,12 +61,12 @@ const GIT_OWNER_TYPE_ONLY = [
 
 const PUBLISH_PLATFORMS = [
   {
-    name: "OSS",
-    value: "oss",
-  },
-  {
     name: "Nginx",
     value: "nginx",
+  },
+  {
+    name: "OSS",
+    value: "oss",
   },
 ];
 export class Git {
