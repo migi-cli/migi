@@ -1,7 +1,7 @@
 import { cac } from "cac";
 import pkg from "../package.json";
 import { log } from "./utils";
-import { create, publish } from "./commands";
+import { create, publish, cacheList, cacheClear } from "./commands";
 import { DEFAULT_ORG } from "./constants";
 import prepare from "./prepare";
 const cli = cac();
@@ -44,6 +44,9 @@ function registerCommand() {
     .option("--sshPath <ssh path>", "ssh path")
     .option("--prod", "Publish to production")
     .action(publish);
+
+  cli.command("cache ls", "List the cache of Migi").action(cacheList);
+  cli.command("cache clear", "Clear the cache of Migi").action(cacheClear);
 
   cli.help();
   cli.version(pkg.version);
