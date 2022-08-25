@@ -71,7 +71,7 @@ export default class CloudBuild {
   }
 
   async prepare() {
-    if (this.platform === "os") {
+    if (this.platform === "oss") {
       // 如果已经发布过项目，那么判断是否需要覆盖
       const ossProject = await getOSS({
         name: this.name,
