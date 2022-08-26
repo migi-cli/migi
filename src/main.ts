@@ -34,10 +34,10 @@ function registerCommand() {
     .option("--reset", "Reset both `git config` and `publish platform`")
     .option(
       "--resetGit",
-      "Reset `~/migi/.git/.gitserver`/`~/migi/.git/.gittoken`/`~/migi/.git/.gitown`"
+      "Reset `~/.migi/git/.gitserver`/`~/.migi/git/.gittoken`/`~/.migi/git/.gitown`"
     )
-    .option("--resetGitOwn", "Reset `~/migi/.git/.gitown`")
-    .option("--resetPlatform", "Reset `~/migi/.git/.publishplatform`")
+    .option("--resetGitOwn", "Reset `~/.migi/git/.gitown`")
+    .option("--resetPlatform", "Reset `~/.migi/git/.publishplatform`")
     .option("--sshUser <ssh user>", "ssh user")
     .option("--sshPassword <ssh password>", "ssh password")
     .option("--sshIp <ssh ip>", "ssh ip")
@@ -45,8 +45,17 @@ function registerCommand() {
     .option("--prod", "Publish to production")
     .action(publish);
 
-  cli.command("cache ls", "List the cache of Migi").action(cacheList);
-  cli.command("cache clear", "Clear the cache of Migi").action(cacheClear);
+  cli
+    .command("cache-list", "List the cache of Migi")
+    .alias("cl")
+    .action(cacheList);
+
+  cli
+    .command("cache-clear", "Clear the cache of Migi")
+    .alias("cc")
+    .option("--template", "Clear cache of `template`")
+    .option("--git", "Clear cache of `git`")
+    .action(cacheClear);
 
   cli.help();
   cli.version(pkg.version);

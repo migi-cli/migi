@@ -16,7 +16,7 @@ import Gitlab from "./Gitlab";
 import { ApiResult } from "./request";
 import CloudBuild from "../build";
 
-const GIT_ROOT_DIR = ".git";
+const GIT_ROOT_DIR = "git";
 const GIT_SERVER_FILE = ".gitserver";
 const GIT_TOKEN_FILE = ".gittoken";
 const GIT_LOGIN_FILE = ".gitlogin";
@@ -690,7 +690,7 @@ pnpm-debug.log*
   // }
 
   // 创建本地缓存文件
-  // ~/.migi/.git/${filename}
+  // ~/.migi/git/${filename}
   createCachePath(filename: string): string {
     const gitDir = path.resolve(this.cliHome, GIT_ROOT_DIR);
     const cachePath = path.resolve(gitDir, filename);

@@ -55,5 +55,24 @@ migi publish -h
 ```
 ![](https://raw.githubusercontent.com/tian0o0/pic/master/20220825223335.png)
 
+**缓存**
+```sh
+# 查看Migi缓存
+migi cache-list
+# 别名
+migi cl
 
+# 清除Migi缓存
+migi cache-clear
+# 别名
+migi cc
+# 更多使用方式
+migi cc -h
+```
 
+### 自定义环境变量
+
+`migi-cli`默认全局缓存目录为`~/.migi`，如果目录存在冲突，可以在`~/.env`下自定义缓存目录的位置：
+```
+MIGI_CLI_HOME=.migi-cli
+```

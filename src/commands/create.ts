@@ -65,7 +65,13 @@ class MigiCreate implements Migi {
     const { template } = this.prepareInfo;
     const api = `${org}/${template}`;
 
-    const cachePath = path.join(userHome, process.env.MIGI_CLI_HOME!, template);
+    // ~/.migi/template/{template}
+    const cachePath = path.join(
+      userHome,
+      process.env.MIGI_CLI_HOME!,
+      "template",
+      template
+    );
 
     if (!fse.pathExistsSync(cachePath) || this.options.refreshTemplate) {
       const loading = ora("Downloading repo");
