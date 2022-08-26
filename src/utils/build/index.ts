@@ -144,9 +144,9 @@ export default class CloudBuild {
             loading.start();
           } else if (action.includes("end")) {
             if (message.includes("成功")) {
-              loading.succeed(message);
+              loading?.succeed(message);
             } else {
-              loading.fail(message);
+              loading?.fail(message);
             }
           }
         } else {

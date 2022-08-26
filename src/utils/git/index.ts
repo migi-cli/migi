@@ -634,10 +634,13 @@ pnpm-debug.log*
     if (this.prod) {
       await this.checkTag(); // 打tag
       await this.checkoutBranch("master"); // 切换至master分支
-      await this.mergeFromTo(this.branch, "master"); // 代码合并至master分支
-      await this.pushOrigin("master"); // 推送至远程master分支
-      await this.deleteLocalBranch(); // 删除本地开发分支
-      await this.deleteRemoteBranch(); // 删除远程开发分支
+      // TODO: 提交一个mergere quest至master分支
+      // await this.mergeFromTo(this.branch, "master"); // 代码合并至master分支
+      // await this.pushOrigin("master"); // 推送至远程master分支
+      // await this.deleteRemoteBranch(); // 删除远程开发分支
+      // await this.deleteLocalBranch(); // 删除本地开发分支
+    } else {
+      // TODO: 提交一个merge request至test分支
     }
   }
 
