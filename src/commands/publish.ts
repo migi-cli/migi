@@ -9,7 +9,7 @@ class MigiPublish implements Migi {
   private prepareInfo: PublishPrepareInfo = {} as PublishPrepareInfo;
 
   constructor(options: PublishOptions) {
-    const staticConfig = readMigirc();
+    const staticConfig = readMigirc(options.prod);
     this.options = {
       ...staticConfig,
       ...options,
