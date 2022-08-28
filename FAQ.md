@@ -6,4 +6,9 @@
 - 定制复杂：jenkins/travis 定制过程需要使用 java 开发插件，对前端不够友好
 
 ### Windows上运行命令失败
-目前暂时只支持`MacOS`/`Linux`系统，windows需要做额外的兼容性处理
+> 无法加载文件 C:\Program Files\nodejs\migi.ps1，因为在此系统上禁止运行脚本。
+
+解决方式如下：
+- 1.右键点击左下角任务栏开始菜单按钮，点击 "Windows powerShell(管理员)(A)"，以管理员的权限打开命令终端。
+- 2.输入命令：`set-executionpolicy remotesigned` 然后回车。
+- 3.输入y按回车。问题解决。
