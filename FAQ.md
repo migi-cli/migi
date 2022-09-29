@@ -12,3 +12,6 @@
 - 1.右键点击左下角任务栏开始菜单按钮，点击 "Windows powerShell(管理员)(A)"，以管理员的权限打开命令终端。
 - 2.输入命令：`set-executionpolicy remotesigned` 然后回车。
 - 3.输入y按回车。问题解决。
+
+### 持续集成（发布至Nginx）最后一步发布失败
+原因目前暂时不明，因为发布时会在Migi服务器上利用`node-scp`传输文件至目标服务器，`node-scp`底层利用了`ssh2`这个包，由于ssh不通（可能也ping不通，但是在本地完全没问题），因此无法进行连接（报错为：`Error: Timed out while waiting for handshake`）。

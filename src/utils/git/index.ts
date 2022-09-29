@@ -581,12 +581,9 @@ pnpm-debug.log*
     if (!pkg.scripts || !Object.keys(pkg.scripts).includes("build")) {
       throw new Error("`build` script was not found");
     }
-    // if (this.buildCmd) {
-    //   execSync(this.buildCmd, {
-    //     cwd: this.dir,
-    //   });
-    // }
-    execSync("npm run build", {
+    // TODO: 考虑传入自定义打包命令
+    const command = this.prod ? "npm run build" : "npm run build:test";
+    execSync(command, {
       cwd: this.dir,
     });
     log.success("CheckLocalBuild", "Good, build dist without error");
